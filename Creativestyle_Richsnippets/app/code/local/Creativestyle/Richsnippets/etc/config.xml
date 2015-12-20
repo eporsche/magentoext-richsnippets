@@ -60,7 +60,7 @@
         <richsnippets>
             <general>
                 <enabled>1</enabled>
-                <review>1</review>
+                <review>0</review>
             </general>
             <attributes>
                 <manufacturer>manufacturer</manufacturer>
