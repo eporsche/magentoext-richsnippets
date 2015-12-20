@@ -1,0 +1,22 @@
+{
+	"name" : "mborkowski/magentoext-richsnippets",
+	"type" : "magento-module",
+	"description" : "Magento Jason LD Module",
+	"homepage" : "na",
+	"require" : {
+		"magento-hackathon/magento-composer-installer" : "~2.1.1"
+	},
+	"authors" : [{
+			"name" : "mborkowski"
+		}
+	],
+	"extra" : {
+		"magento_connect" : {
+			"channel" : "local",
+			"php_min" : "5.3.0",
+			"php_max" : "6.0.0",
+			"stability" : "beta",
+			"summary" : "Magento Jason LD Module"
+		}
+	}
+}
