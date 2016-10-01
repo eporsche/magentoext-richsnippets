@@ -121,13 +121,11 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                     'category' => $json['category']
                 )
             );
-	    // EP: if price > 0 add to array
-	    if((float)$product->getFinalPrice()>0){ 
-                $data['offers'] = array(
-		       'price' => number_format((float)$product->getFinalPrice(), 2, '.', ''),
-                       'priceCurrency' => $currencyCode			
-		);
-	    }
+		// EP: if price > 0 add to array
+		if((float)$product->getFinalPrice()>0){
+			$data['offers']['price'] = number_format((float)$product->getFinalPrice(), 2, '.', '');
+	                $data['offers']['priceCurrency'] = $currencyCode;
+		}
             // if reviews enabled - join it to $data array
             if($review){
                 $data['aggregateRating'] = array(
