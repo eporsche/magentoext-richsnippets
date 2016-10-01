@@ -67,10 +67,14 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                         foreach ($r->getRatingVotes() as $vote) {
                             $ratings[] = $vote->getPercent();
                         }
-
-                        $avg = array_sum($ratings) / count($ratings);
-                        $avg = number_format(floor(($avg / 20) * 2) / 2, 1); // average rating (1-5 range)
-
+			
+                        $avgdata = array_sum($ratings) / count($ratings);
+                        $avgdata = number_format(floor(($avgdata / 20) * 2) / 2, 1); // average rating (1-5 range)
+			$avg[] = array(
+                            '@type' => 'Rating',
+                            'ratingValue' => $avgdata
+                            );
+                            
                         $datePublished = explode(' ', $r->getCreatedAt());
 
                         // another "mini-array" with schema data
@@ -113,13 +117,17 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                 'description' => $descsnippet, //use Desc if Shortdesc not work
                 'offers' => array(
                     '@type' => 'Offer',
-                    'availability' => $json['availability'],
-                    'price' => number_format((float)$product->getFinalPrice(), 2, '.', ''),
-                    'priceCurrency' => $currencyCode,
+                    'availability' => $json['availability'],                    
                     'category' => $json['category']
                 )
             );
-
+	    // EP: if price > 0 add to array
+	    if((float)$product->getFinalPrice()>0){ 
+                $data['offers'] = array(
+		       'price' => number_format((float)$product->getFinalPrice(), 2, '.', ''),
+                       'priceCurrency' => $currencyCode			
+		);
+	    }
             // if reviews enabled - join it to $data array
             if($review){
                 $data['aggregateRating'] = array(
