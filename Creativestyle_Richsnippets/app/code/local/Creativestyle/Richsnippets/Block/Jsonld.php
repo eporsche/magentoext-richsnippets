@@ -123,7 +123,7 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
 				'availability' => $json['availability'],
 				'category' => $json['category'],
 				'price' => number_format((float)$product->getFinalPrice(), 2, '.', ''),
-	                	'priceCurrency' = $currencyCode
+	                	'priceCurrency' => $currencyCode
 			);
 		}
             // if reviews enabled - join it to $data array
