@@ -103,7 +103,7 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
 		$descsnippet = html_entity_decode(strip_tags($product->getFeatures()));   
 	   } else if( $product->getShortDescription() ) {
             	$descsnippet = html_entity_decode(strip_tags($product->getShortDescription()));
-	   } else ($product->getDescription()) {
+	   } else {
 		$descsnippet = Mage::helper('core/string')->substr(html_entity_decode(strip_tags($product->getDescription())), 0, 165);
 	   }
 
