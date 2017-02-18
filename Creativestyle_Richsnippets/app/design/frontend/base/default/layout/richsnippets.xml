@@ -5,7 +5,7 @@
     </default>
     
     <catalog_product_view>
-        <reference name="footer">
+        <reference name="before_body_end">
             <block type="richsnippets/jsonld" name="richsnippets" after="-" template="richsnippets/index.phtml" />
         </reference>
     </catalog_product_view>
