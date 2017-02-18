@@ -100,11 +100,11 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
 
             //use Desc if Shortdesc not work 	   
 	   if($product->getFeatures()) {
-		$descsnippet = html_entity_decode(strip_tags($product->getFeatures()));   
+		  $descsnippet = preg_replace('/\s\s+/', ' ', html_entity_decode(strip_tags($product->getFeatures())));   
 	   } else if( $product->getShortDescription() ) {
-            	$descsnippet = html_entity_decode(strip_tags($product->getShortDescription()));
+            	$descsnippet = preg_replace('/\s\s+/', ' ',html_entity_decode(strip_tags($product->getShortDescription())));
 	   } else {
-		$descsnippet = Mage::helper('core/string')->substr(html_entity_decode(strip_tags($product->getDescription())), 0, 165);
+		$descsnippet = preg_replace('/\s\s+/', ' ', Mage::helper('core/string')->substr(html_entity_decode(strip_tags($product->getDescription())), 0, 165));
 	   }
 
             // Final array with all basic product data
@@ -151,7 +151,7 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
             }
 
             // return $data table in JSON format
-            return '[' . json_encode($data) . ']';
+            return '[' . json_encode($data,JSON_UNESCAPED_UNICODE) . ']';
         }
 
         return null;
