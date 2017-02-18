@@ -98,14 +98,15 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                 $json['review'] = $reviewData;
             }
 
-            //use Desc if Shortdesc not work 	   
-	   if($product->getFeatures()) {
-		  $descsnippet = preg_replace('/\s\s+/', ' ', html_entity_decode(strip_tags($product->getFeatures())));   
-	   } else if( $product->getShortDescription() ) {
-            	$descsnippet = preg_replace('/\s\s+/', ' ',html_entity_decode(strip_tags($product->getShortDescription())));
-	   } else {
-		$descsnippet = preg_replace('/\s\s+/', ' ', Mage::helper('core/string')->substr(html_entity_decode(strip_tags($product->getDescription())), 0, 165));
-	   }
+           //use Desc if Shortdesc not work
+           $descsnippet =" ";
+    	   if($product->getFeatures()) {
+    		  $descsnippet = $product->getFeatures();   
+    	   } else if( $product->getShortDescription() ) {
+              $descsnippet = $product->getShortDescription();
+    	   } else {
+    		 $descsnippet = $product->getDescription();
+    	   }
 
             // Final array with all basic product data
             $data = array(
@@ -116,7 +117,7 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                 'image' => $product->getImageUrl(),
                 'url' => $product->getProductUrl(),
                 //'description' => trim(preg_replace('/\s+/', ' ', $this->stripTags($product->getShortDescription()))),
-                'description' => $descsnippet //use Desc if Shortdesc not work               
+                'description' => preg_replace('/\s\s+/', ' ', html_entity_decode(strip_tags($descsnippet))) //use Desc if Shortdesc not work               
             );
 		// Google will show a warning if offer is without price info
 		if((float)$product->getFinalPrice()>0){
