@@ -98,12 +98,14 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                 $json['review'] = $reviewData;
             }
 
-            //use Desc if Shortdesc not work
-            if( $product->getShortDescription() ) {
+            //use Desc if Shortdesc not work 	   
+	   if($product->getFeatures()) {
+		$descsnippet = html_entity_decode(strip_tags($product->getFeatures()));   
+	   } else if( $product->getShortDescription() ) {
             	$descsnippet = html_entity_decode(strip_tags($product->getShortDescription()));
-			} else {
-				$descsnippet = Mage::helper('core/string')->substr(html_entity_decode(strip_tags($product->getDescription())), 0, 165);
-			}
+	   } else ($product->getDescription()) {
+		$descsnippet = Mage::helper('core/string')->substr(html_entity_decode(strip_tags($product->getDescription())), 0, 165);
+	   }
 
             // Final array with all basic product data
             $data = array(
