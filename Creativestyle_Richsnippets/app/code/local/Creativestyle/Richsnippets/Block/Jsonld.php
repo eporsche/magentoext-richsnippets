@@ -114,17 +114,17 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                 'image' => $product->getImageUrl(),
                 'url' => $product->getProductUrl(),
                 //'description' => trim(preg_replace('/\s+/', ' ', $this->stripTags($product->getShortDescription()))),
-                'description' => $descsnippet, //use Desc if Shortdesc not work
-                'offers' => array(
-                    '@type' => 'Offer',
-                    'availability' => $json['availability'],                    
-                    'category' => $json['category']
-                )
+                'description' => $descsnippet //use Desc if Shortdesc not work               
             );
-		// EP: if price > 0 add to array
+		// Google will show a warning if offer is without price info
 		if((float)$product->getFinalPrice()>0){
-			$data['offers']['price'] = number_format((float)$product->getFinalPrice(), 2, '.', '');
-	                $data['offers']['priceCurrency'] = $currencyCode;
+			$data['offers'] = array (
+				'@type' => 'Offer',
+				'availability' => $json['availability'],
+				'category' => $json['category'],
+				'price' => number_format((float)$product->getFinalPrice(), 2, '.', ''),
+	                	'priceCurrency' = $currencyCode
+			);
 		}
             // if reviews enabled - join it to $data array
             if($review){
