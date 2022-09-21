@@ -4,7 +4,7 @@
 	"description" : "Magento Jason LD Module",
 	"homepage" : "na",
 	"require" : {
-		"magento-hackathon/magento-composer-installer" : "~2.1.1"
+		"magento-hackathon/magento-composer-installer" : "*"
 	},
 	"authors" : [{
 			"name" : "mborkowski"
