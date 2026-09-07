@@ -80,9 +80,9 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
                         // another "mini-array" with schema data
                         $reviewData[] = array(
                             '@type' => 'Review',
-                            'author' => $this->htmlEscape($r->getNickname()),
+                            'author' => $this->escapeHtml($r->getNickname()),
                             'datePublished' => str_replace('/', '-', $datePublished[0]),
-                            'name' => $this->htmlEscape($r->getTitle()),
+                            'name' => $this->escapeHtml($r->getTitle()),
                             'reviewBody' => nl2br($this->escapeHtml($r->getDetail())),
                             'reviewRating' => array(
                                 '@type'       => 'Rating',
