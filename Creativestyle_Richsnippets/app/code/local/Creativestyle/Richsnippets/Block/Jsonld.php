@@ -26,6 +26,40 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
         return $value;
     }
 
+    /**
+     * Final price incl. tax, or null for a product without price
+     */
+    public function getVisiblePrice($product)
+    {
+        if ($product->getCanShowPrice() === false || (float)$product->getPrice() <= 0) {
+            return null;
+        }
+        $store = $product->getStore();
+        $finalPrice = $store->roundPrice($store->convertPrice($product->getFinalPrice()));
+        return (float)Mage::helper('tax')->getPrice($product, $finalPrice, true);
+    }
+
+    /**
+     * Same URL as <link rel="canonical">, with the ___SID placeholder resolved
+     */
+    public function getCanonicalUrl($product)
+    {
+        $url = $product->getUrlModel()->getUrl($product, array('_ignore_category' => true));
+        return Mage::getSingleton('core/url')->sessionUrlVar($url);
+    }
+
+    /**
+     * Original image instead of a resized cache copy
+     */
+    public function getImageUrl($product)
+    {
+        $image = $product->getImage();
+        if (!$image || $image === 'no_selection') {
+            return $product->getImageUrl();
+        }
+        return $product->getMediaConfig()->getMediaUrl($image);
+    }
+
     public function getStructuredData()
     {
         // get product
@@ -33,14 +67,12 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
 
         // check if $product exists
         if($product){
-            $categoryName = Mage::registry('current_category') ? Mage::registry('current_category')->getName() : '';
             $productId = $product->getEntityId();
             $storeId = Mage::app()->getStore()->getId();
             $currencyCode = Mage::app()->getStore()->getCurrentCurrencyCode();
 
             $json = array(
-                'availability' => $product->isAvailable() ? 'http://schema.org/InStock' : 'http://schema.org/OutOfStock',
-                'category' => $categoryName
+                'availability' => $product->isAvailable() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
             );
 
             // check if reviews are enabled in extension's backend configuration
@@ -110,25 +142,28 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
 
             // Final array with all basic product data
             $data = array(
-                '@context' => 'http://schema.org',
+                '@context' => 'https://schema.org',
                 '@type' => 'Product',
                 'name' => $product->getName(),
-                'sku' => $product->getSku(),
-                'image' => $product->getImageUrl(),
-                'url' => $product->getProductUrl(),
-                //'description' => trim(preg_replace('/\s+/', ' ', $this->stripTags($product->getShortDescription()))),
-                'description' => preg_replace('/\s\s+/', ' ', html_entity_decode(strip_tags($descsnippet))) //use Desc if Shortdesc not work               
+                'sku' => trim($product->getSku()),
+                'image' => $this->getImageUrl($product),
+                'url' => $this->getCanonicalUrl($product)
             );
-		// Google will show a warning if offer is without price info
-		if((float)$product->getFinalPrice()>0){
-			$data['offers'] = array (
-				'@type' => 'Offer',
-				'availability' => $json['availability'],
-				'category' => $json['category'],
-				'price' => number_format((float)$product->getFinalPrice(), 2, '.', ''),
-	                	'priceCurrency' => $currencyCode
-			);
-		}
+            $description = trim(preg_replace('/\s\s+/', ' ', html_entity_decode(strip_tags($descsnippet))));
+            if ($description !== '') {
+                $data['description'] = $description;
+            }
+
+            // No offer without a price
+            $price = $this->getVisiblePrice($product);
+            if ($price !== null) {
+                $data['offers'] = array(
+                    '@type' => 'Offer',
+                    'availability' => $json['availability'],
+                    'price' => number_format($price, 2, '.', ''),
+                    'priceCurrency' => $currencyCode
+                );
+            }
             // if reviews enabled - join it to $data array
             if($review){
                 $data['aggregateRating'] = array(
@@ -147,12 +182,21 @@ class Creativestyle_Richsnippets_Block_Jsonld extends Mage_Core_Block_Template
             // ... and putting them into $data array if they're not empty
             foreach($attributes AS $key => $value){
                 if($value){
-                    $data[$key] = $this->getAttributeValue($value);
+                    $attributeValue = trim((string)$this->getAttributeValue($value));
+                    if ($attributeValue === '' || $attributeValue === 'N/A') {
+                        continue;
+                    }
+                    // Google reads the manufacturer as brand
+                    if ($key === 'manufacturer') {
+                        $data['brand'] = array('@type' => 'Brand', 'name' => $attributeValue);
+                    } else {
+                        $data[$key] = $attributeValue;
+                    }
                 }
             }
 
             // return $data table in JSON format
-            return '[' . json_encode($data,JSON_UNESCAPED_UNICODE) . ']';
+            return '[' . json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) . ']';
         }
 
         return null;
